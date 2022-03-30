@@ -20,7 +20,7 @@ public class SummonTargetedAbility : TargetedAbility
             }
 
             if (unit != null)
-                text += " призывает " + unit.Tooltip;
+                text += " summons " + unit.Tooltip;
 
             return text;
         }

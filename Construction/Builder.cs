@@ -4,7 +4,7 @@ using Context;
 using static Players;
 using Photon.Pun;
 
-// Строительство зданий
+// Building construction
 public class Builder : MonoBehaviour
 {
     [SerializeField]
@@ -34,17 +34,16 @@ public class Builder : MonoBehaviour
         buttons = buildMenu.GetComponentsInChildren<BuildButton>();
         ReloadPreparingCustomProperties(true);
 
-        // настроечный объект расы
+        // fraction setting object
         GameObject tool = Resources.Load<GameObject>("Races/" + Race + "/Ups");
         ToolUp = Instantiate(tool, transform).GetComponent<ToolUp>();
 
-        // включаем дефолтный режим
         SetDefaultUI();
     }
 
     private void Start()
     {
-        // добавим ботов при необходимости
+        // add AI's if needed
         if (PhotonNetwork.IsMasterClient)
             foreach (Player bot in GetBotPlayers())
                 gameObject.AddComponent<BotBuilder>().SetBot(bot);
@@ -64,13 +63,13 @@ public class Builder : MonoBehaviour
             SetPerformerUI(InputController.Selected.ID);
     }
 
-    // окно строительства доступных зданий
+    // available build window
     private void SetDefaultUI()
     {
         HideButtons();
         Selected = string.Empty;
 
-        // активируем кнопки строительства зданий с уровнем 0
+        // enable build buttons for initial level buildings
         Dictionary<Naming, string> texts = ToolUp.GetBuildableTexts();
 
         for (int i = 0; i < buttons.Length; i++)
@@ -87,7 +86,7 @@ public class Builder : MonoBehaviour
         }
     }
 
-    // окно улучшения выбранного здания
+    // build improvement window
     private void SetPerformerUI(Naming selected)
     {
         HideButtons();
@@ -102,10 +101,10 @@ public class Builder : MonoBehaviour
         if (Selected.Owner != IndexOfPlayer(Myself.Id))
             return;
 
-        // активируем кнопки строительства зданий с уровнем выше 0
+        // enable build buttons for not initial level buildings
         Dictionary<Naming, string> texts = ToolUp.GetBuildableTexts(Selected);
 
-        // заполняем 3, 7 и 11 кнопку следующими по грейду значениями
+        // fill 3, 7 and 11 buttons with next grade values
         for (int i = 3; i <= 11; i += 4)
         {
             foreach (Naming id in texts.Keys)
@@ -126,7 +125,7 @@ public class Builder : MonoBehaviour
             button.Disable();
     }
     
-    // нажатие на кнопку строительства
+    // on building button click
     public void Fitting(int index)
     {
         if (Selected == string.Empty)
@@ -135,7 +134,7 @@ public class Builder : MonoBehaviour
             UpgradeBuilding(index);
     }
 
-    // начало выбора места строительства
+    // build position selection
     private void StartFitting(int buttonIndex)
     {
         if (fitter.IsHandling) 
@@ -154,7 +153,6 @@ public class Builder : MonoBehaviour
         fitter.Enable(fitId, prefab.GetComponent<MeshFilter>().sharedMesh);
     }
 
-    // улучшение здания
     private void UpgradeBuilding(int buttonIndex)
     {
         char fitId = Selected.Id;
@@ -171,16 +169,16 @@ public class Builder : MonoBehaviour
         if (!fitter.IsHandling)
             return;
 
-        // обновляем позицию макета, если соблюдена зона строительства
+        // update fitter position within the construction site
         if (Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, Mathf.Infinity, 1 << (int)Side + 11))
             if (!Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition), Mathf.Infinity, (1 << 3) | (1 << 9)))
                 fitter.Position = Fitter.RoundToBuildablePoint(hit.point);
 
-        // на правую кнопку примерка отменяется
+        // cancel on right button
         if (Input.GetMouseButton(1))
             fitter.Disable();
         else
-        // на левую кнопку строим здание
+        // build on left button
         if (Input.GetMouseButtonDown(0) && fitter.Position != Vector3.zero)
             if (SpendMyStock(ToolUp.GetBuildingCost(fitter.Id, 0)))
             {

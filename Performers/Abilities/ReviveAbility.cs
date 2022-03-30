@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ReviveAbility : Ability
 {
-    public override string Tooltip => base.Tooltip + " возрождает случайный труп в качестве союзника";
+    public override string Tooltip => base.Tooltip + " revives random corpse as ally unit";
     private GameObject lastCorpse = null;
 
     protected override void Awake()

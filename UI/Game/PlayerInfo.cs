@@ -45,8 +45,8 @@ public class PlayerInfo : MonoBehaviour
 
     private void OnGUI()
     {
-        stock.text = "<color=yellow>" + Player.Stock + "</color> з.";
-        units.text = "<color=red>" + Instantiator.GetPlayerUnitsCount(index) + "</color> ед-ц";
+        stock.text = "<color=yellow>" + Player.Stock + "</color> gold";
+        units.text = "<color=red>" + Instantiator.GetPlayerUnitsCount(index) + "</color> count";
     }
 
     public void OnToggleClick()

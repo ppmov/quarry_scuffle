@@ -21,7 +21,7 @@ public class Projectile
     [System.Serializable]
     public struct Modifier
     {
-        public enum Type { Взрывной, Отскакивающий, Вампиризм }
+        public enum Type { Blow, Bounce, Vampire }
         public Type type;
         public DamageType damageType;
         public float damage;
@@ -46,7 +46,7 @@ public class Projectile
         if (host == null || target == null)
             return;
 
-        Vector3 shellPos = Technique == Technique.Телекинез
+        Vector3 shellPos = Technique == Technique.Telekinesis
             ? target.HitPosition
             : parameters.shell.transform.position;
 
@@ -58,13 +58,13 @@ public class Projectile
         if (host == null || target == null)
             return;
 
-        Vector3 shellPos = Technique == Technique.Телекинез
+        Vector3 shellPos = Technique == Technique.Telekinesis
             ? target.HitPosition
             : parameters.shell.transform.position;
 
         foreach (Vulnerable vul in targets)
         {
-            if (Technique == Technique.Телекинез)
+            if (Technique == Technique.Telekinesis)
                 shellPos = vul.HitPosition;
 
             Instantiate(host, vul, shellPos + parameters.spawnPosition);
@@ -73,13 +73,12 @@ public class Projectile
 
     private void Instantiate(Vulnerable host, Vulnerable target, Vector3 position)
     {
-        // создадим снаряд и направим его непосредственно к цели
+        // create projectile and push it to target
         target.DoesItReach(position, 0, out Vector3 hitVector, false);
         GameObject flyShell = Object.Instantiate(parameters.shell, position, hitVector == Vector3.zero
                                             ? Quaternion.identity
                                             : Quaternion.LookRotation(hitVector.normalized) * Quaternion.Euler(-90f, 0f, 0f));
 
-        // активация снаряда
         flyShell.SetActive(true);
 
         if (parameters.modifiers.Count > 0)

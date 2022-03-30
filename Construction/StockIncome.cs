@@ -17,7 +17,6 @@ public class StockIncome : MonoBehaviour
             IncomeAllPlayers(exchangeValue * 4);
     }
 
-    // постоянный доход всех игроков
     private void FixedUpdate()
     {
         ReloadRealtimeCustomProperties();

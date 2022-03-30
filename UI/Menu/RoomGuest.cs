@@ -5,7 +5,7 @@ using Photon.Pun;
 using static Players;
 using System.Collections.Generic;
 
-// Игрок как элемент интерфейса
+// Player cell for room menu
 public class RoomGuest : MonoBehaviour
 {
     [SerializeField]
@@ -83,8 +83,8 @@ public class RoomGuest : MonoBehaviour
 
     private void SetFree()
     {
-        playerName.text = "Свободное место";
-        ButtonType = "Занять";
+        playerName.text = "Free place";
+        ButtonType = "Take";
         race.interactable = false;
         race.value = 0;
         ReadyFlag = false;
@@ -109,7 +109,7 @@ public class RoomGuest : MonoBehaviour
             race.value = Races.IndexOf(player.Race);
 
             if (PhotonNetwork.IsMasterClient)
-                ButtonType = "Кикнуть";
+                ButtonType = "Kick";
             else
                 ButtonType = string.Empty;
         }
@@ -125,11 +125,11 @@ public class RoomGuest : MonoBehaviour
     {
         switch (ButtonType)
         {
-            case "Занять":
+            case "Take":
                 settings.OnReady(false);
                 SetMyProperty("pos", index);
                 break;
-            case "Кикнуть":
+            case "Kick":
                 KickPlayer(index);
                 break;
             default:

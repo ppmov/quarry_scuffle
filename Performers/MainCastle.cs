@@ -41,7 +41,7 @@ public class MainCastle : MonoBehaviour
 
     void OnDestroy()
     {
-        // если крепость противоположной стороны уничтожена, значит победителя нет
+        // if the enemy castle destroyed, there are no winner
         if (Instantiator.GetCastle(Sider.Invert(side)) != null)
             builder.EndGame(side, transform.position, transform.rotation);
     }

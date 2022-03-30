@@ -26,18 +26,17 @@ public class ProjectileBehaviour : MonoBehaviour
         myLastPosition = transform.position;
         targetLastPosition = transform.position;
 
-        // параметры перемещения
-        if (projectile.technique == Technique.Ближний)
+        if (projectile.technique == Technique.Melee)
             projectile.speed = 1f;
     }
 
-    // все снаряды самонаводящиеся
+    // all projectile are self-targeted
     private void FixedUpdate()
     {
         if (recessive) 
             return;
 
-        // двигаемся, пока не достигнем цели
+        // move until reaching
         Vector3 hitVector = targetLastPosition - transform.position;
         float reachDistance = (transform.position - myLastPosition).magnitude;
 
@@ -77,18 +76,18 @@ public class ProjectileBehaviour : MonoBehaviour
                 if (mod.Fx != null)
                     Instantiate(mod.Fx, transform.position + mod.relativeFxVector, Quaternion.identity);
 
-                if (mod.affectsOnly == PerformerType.Нечто ||
+                if (mod.affectsOnly == PerformerType.Anything ||
                     mod.affectsOnly == Target.PerformerType)
                 {
                     switch (mod.type)
                     {
-                        case Projectile.Modifier.Type.Взрывной:
+                        case Projectile.Modifier.Type.Blow:
                             Blow(mod);
                             break;
-                        case Projectile.Modifier.Type.Отскакивающий:
+                        case Projectile.Modifier.Type.Bounce:
                             Bounce(mod);
                             break;
-                        case Projectile.Modifier.Type.Вампиризм:
+                        case Projectile.Modifier.Type.Vampire:
                             Vampire(mod);
                             break;
                     }
@@ -124,13 +123,13 @@ public class ProjectileBehaviour : MonoBehaviour
         bouncerParams.damageType = mod.damageType;
         bouncerParams.technique = mod.technique;
         
-        // создадим новый массив, чтоб изменения не влияли на родителя
+        // create new list to unchain parent changes
         bouncerParams.modifiers = new List<Projectile.Modifier>(projectile.modifiers.Count);
         mod.damage /= 2f;
 
         for (int i = 0; i < projectile.modifiers.Count; i++)
         {
-            if (projectile.modifiers[i].type == Projectile.Modifier.Type.Отскакивающий)
+            if (projectile.modifiers[i].type == Projectile.Modifier.Type.Bounce)
                 bouncerParams.modifiers.Add(mod);
             else
                 bouncerParams.modifiers.Add(projectile.modifiers[i]);
@@ -146,7 +145,7 @@ public class ProjectileBehaviour : MonoBehaviour
             return;
 
         Projectile.Parameters vampParams = projectile;
-        // снаряд должен лететь от цели к хосту
+        // push back
         vampParams.spawnPosition = transform.position - Host.HitPosition;
         vampParams.damage = mod.damage;
         vampParams.damageType = mod.damageType;

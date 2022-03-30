@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Context;
 
-// подсчет наносимого урона
+// Dealing damage counting
 public static class Resistances
 {
     private static readonly List<List<float>> combinations;
@@ -10,11 +10,11 @@ public static class Resistances
     {
         combinations = new List<List<float>>()
         {
-                    /* Броня:   Естс, Легк, Тяжл, Амаг, Укрп  */// Урон:
-            new List<float>() { 1.3f,   1f, 0.7f, 1.2f, 0.3f }, // Тупой
-            new List<float>() {   1f, 1.3f, 0.7f, 1.2f, 0.3f }, // Колющий
-            new List<float>() {   1f,   1f, 1.3f, 0.5f, 0.3f }, // Магический
-            new List<float>() { 0.7f, 0.7f, 0.7f, 0.7f, 1.3f }  // Осадный
+                    /* Armor:   natu, ligh, heav, anti, fort  */// Damage:
+            new List<float>() { 1.3f,   1f, 0.7f, 1.2f, 0.3f }, // normal
+            new List<float>() {   1f, 1.3f, 0.7f, 1.2f, 0.3f }, // pierce
+            new List<float>() {   1f,   1f, 1.3f, 0.5f, 0.3f }, // magic
+            new List<float>() { 0.7f, 0.7f, 0.7f, 0.7f, 1.3f }  // siege
         };
     }
 

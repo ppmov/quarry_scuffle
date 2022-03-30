@@ -7,7 +7,7 @@ using static UnityEngine.Mathf;
 using static Players;
 using static Options;
 
-// Управление объектом - анимация, передвижение, выбор действий
+// Unit and building controller - animation, moves, actions
 public class AI : MonoBehaviour, IPunInstantiateMagicCallback, IObjectReader
 {
     private const int defaultAct = 10;
@@ -72,16 +72,15 @@ public class AI : MonoBehaviour, IPunInstantiateMagicCallback, IObjectReader
     private Animator anim;
     private PhotonView photonView;
     private int fixedTick = maxFixedTicks - 1;
-    private float endMovingTime4Rotation; // необходимо для плавного поворота
+    private float endMovingTime4Rotation; // need for smooth rotate
 
-    // инициация объекта после создания
     public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
         if (info.photonView.InstantiationData == null) return;
-        // владелец
+        // owner
         ChangeOwner((byte)info.photonView.InstantiationData[0]);
         int index = (byte)info.photonView.InstantiationData[1];
-        // идентификатор
+        // identification
         gameObject.name = gameObject.name.Replace("(Clone)", string.Empty) + '.' + Owner + index;
         Instantiator.AddPerformer(this);
 
@@ -106,7 +105,7 @@ public class AI : MonoBehaviour, IPunInstantiateMagicCallback, IObjectReader
 
     private void Awake()
     {
-        if (photonView == null) // без этого объекта AI не работает
+        if (photonView == null)
             photonView = GetComponent<PhotonView>();
 
         if (Vulnerable == null)
@@ -137,14 +136,16 @@ public class AI : MonoBehaviour, IPunInstantiateMagicCallback, IObjectReader
         }
     }
 
-    // принятие решений
+    // decisions
     private void FixedUpdate()
     {
-        // отрабатываем только на мастере
-        if (!PhotonNetwork.IsMasterClient) return;
-        if (Sight == null) return;
+        if (!PhotonNetwork.IsMasterClient) 
+            return;
+        
+        if (Sight == null) 
+            return;
 
-        // отрабатываем только каждый maxFixedTicks вызов
+        // only call every maxFixedTicks iteration
         fixedTick++;
 
         if (fixedTick < maxFixedTicks) 
@@ -155,12 +156,12 @@ public class AI : MonoBehaviour, IPunInstantiateMagicCallback, IObjectReader
         string targetName = string.Empty;
         int nextAct = defaultAct;
 
-        // активируем первую доступную способность
+        // enable first available ability
         for (int i = 0; i < Abilities.Count; i++)
             if (Abilities[i].CheckAvailability(out Vulnerable target))
             {
                 if (target == null)
-                    targetName = string.Empty; // цель не нужна
+                    targetName = string.Empty; // don't need target
                 else
                     targetName = target.gameObject.name;
 
@@ -168,7 +169,7 @@ public class AI : MonoBehaviour, IPunInstantiateMagicCallback, IObjectReader
                 break;
             }
 
-        // не вызываем RPC если ни действие ни цель не изменились
+        // don't call RPC if nothing changed
         if (nextAct == act)
         {
             if (Target == null)
@@ -181,24 +182,22 @@ public class AI : MonoBehaviour, IPunInstantiateMagicCallback, IObjectReader
                 return;
         }
         
-        // сменим действие и цель для всех игроков
+        // change action and target
         photonView.RPC(nameof(ChangeAct), RpcTarget.All, nextAct, targetName);
     }
 
     [PunRPC]
-    // вызывается из MasterFixedUpdate для смены действия на всех клиентах
     private void ChangeAct(int next, string targetName)
     {
         Target = Sight.FindByName(targetName);
         act = next;
         endMovingTime4Rotation = Time.time;
 
-        // активируем способность без анимации
+        // immediately enable ability if it has no animation
         if (Ability != null && !Ability.IsAnimated)
             Ability.TryUse();
     }
 
-    // выполнение действий
     private void Update()
     {
         if (Vulnerable != null)
@@ -208,13 +207,11 @@ public class AI : MonoBehaviour, IPunInstantiateMagicCallback, IObjectReader
                 return;
             }
 
-        // анимация
         UpdateAbilityAnimation();
-        // перемешение
         UpdatePositionAndRotation();
     }
 
-    // анимация текущей способности
+    // current ability's animation
     private void UpdateAbilityAnimation()
     {
         if (anim == null || !anim.enabled) 
@@ -233,13 +230,12 @@ public class AI : MonoBehaviour, IPunInstantiateMagicCallback, IObjectReader
 
         if (nav != null)
         {
-            // включаем анимацию передвижения если способность находится в нужном режиме
+            // enable move animation if ability is handling in current state
             bool isMovementAnimatedByAbility = Ability == null ? false : (Ability.CanMoveWhenCocked && Ability.IsCocked);
             anim.SetBool("move", nav.hasPath && !isMovementAnimatedByAbility);
         }
     }
 
-    // перемещение по логике текущей способности
     private void UpdatePositionAndRotation()
     {
         if (act == defaultAct)
@@ -252,14 +248,14 @@ public class AI : MonoBehaviour, IPunInstantiateMagicCallback, IObjectReader
         {
             TargetedAbility rAbility = (TargetedAbility)Ability;
 
-            // направляем к необходимой позиции
+            // move to target
             if (!Target.DoesItReach(Position, rAbility.Range.Value, out Vector3 hitVector))
             {
                 rAbility.UpdateBeforeReaching(out hitVector);
                 SetMovePoint(Position + hitVector);
                 endMovingTime4Rotation = Time.time;
             }
-            // достаточная близость
+            // close enough
             else
             {
                 rAbility.UpdateAtReaching(out hitVector);
@@ -277,7 +273,6 @@ public class AI : MonoBehaviour, IPunInstantiateMagicCallback, IObjectReader
         }
     }
 
-    // перемещение
     private void SetMovePoint(Vector3 point)
     {
         if (nav == null) 
@@ -289,7 +284,7 @@ public class AI : MonoBehaviour, IPunInstantiateMagicCallback, IObjectReader
         if (nav.destination == point) 
             return;
 
-        // нельзя двигаться во время способности
+        // can't move with animation
         if (anim != null)
             if (Ability == null || !Ability.CanMoveWhenCocked)
                 if (anim.GetCurrentAnimatorStateInfo(0).IsTag("Ability"))
@@ -309,7 +304,6 @@ public class AI : MonoBehaviour, IPunInstantiateMagicCallback, IObjectReader
         nav.ResetPath();
     }
 
-    // плавый поворот к цели
     private void LerpLookRotation(Vector3 direction)
     {
         if (direction == Vector3.zero) 
@@ -320,29 +314,28 @@ public class AI : MonoBehaviour, IPunInstantiateMagicCallback, IObjectReader
         transform.rotation = Quaternion.Slerp(transform.rotation, look, (Time.time - endMovingTime4Rotation) / 1f);
     }
 
-    // вызывается из анимации для завершения выполнения способности
+    // called from animation events
     private void UseAbilityInTime()
     {
         if (Ability != null)
             Ability.TryUse();
     }
 
-    // выбор цели для атаки
-    public Vulnerable SelectTarget(Side side, float range, PerformerType affectsOnly = PerformerType.Нечто, int vectorIndex = -1)
+    public Vulnerable SelectTarget(Side side, float range, PerformerType affectsOnly = PerformerType.Anything, int vectorIndex = -1)
     {
         List<Vulnerable> exceptions = new List<Vulnerable>();
 
-        // отдаем приоритет текущей цели
+        // current target has priority
         if (Target != null)
         {
             bool hasAvailableTarget = false;
 
             if (Target.Side == side)
-                if (Target.PerformerType == affectsOnly || affectsOnly == PerformerType.Нечто)
+                if (Target.PerformerType == affectsOnly || affectsOnly == PerformerType.Anything)
                     if (CheckWayToTargetIsFree(Target, range, out Vector3 hitVector, vectorIndex))
                     {
                         if (hitVector.magnitude <= decisionRange)
-                            return Target; // поздно выбирать другую цель
+                            return Target; // it's too late
                         else
                             hasAvailableTarget = true;
                     }
@@ -365,7 +358,6 @@ public class AI : MonoBehaviour, IPunInstantiateMagicCallback, IObjectReader
         }
     }
 
-    // смена владельца
     public void ChangeOwner(byte owner)
     {
         if (owner < MaxPlayersCount)
@@ -374,7 +366,6 @@ public class AI : MonoBehaviour, IPunInstantiateMagicCallback, IObjectReader
         SetMaterial();
     }
 
-    // выделение объекта, отрисовка контура
     public bool HasSubstrate
     {
         get
@@ -500,7 +491,7 @@ public class AI : MonoBehaviour, IPunInstantiateMagicCallback, IObjectReader
         }
         else
         {
-            // конечное уничтожение объекта произойдет в конце последней анимации
+            // object with be destroyed after animation
             Instantiator.MoveUnitToGarbage(this);
             gameObject.name += "[dead]";
 

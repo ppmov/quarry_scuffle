@@ -3,11 +3,11 @@ using Context;
 
 public class ReverseAbility : Ability
 {
-    public override string Tooltip => "При расстоянии менее " + toBaseRange + " м до ближайшей базы разворачивается и бежит в обратную сторону";
+    public override string Tooltip => "Within " + toBaseRange + " range to nearest castle turns around";
     private const float toBaseRange = 25f;
     private Side direction;
 
-    private GameObject Current => direction == Side.Левые ? Instantiator.GetCastle(Side.Левые) : Instantiator.GetCastle(Side.Правые);
+    private GameObject Current => direction == Side.Left ? Instantiator.GetCastle(Side.Left) : Instantiator.GetCastle(Side.Right);
 
     public override bool CheckAvailability(out Vulnerable target)
     {
@@ -25,7 +25,7 @@ public class ReverseAbility : Ability
         if (!base.TryUse())
             return false;
 
-        // поворачиваем персонажа
+        // turn around
         direction = Sider.Invert(direction);
         AI.WhereToGoWhenNoAbility = Current.transform.position;
         return true;
@@ -41,6 +41,6 @@ public class ReverseAbility : Ability
     protected override void OnEnable()
     {
         base.OnEnable();
-        direction = Sider.Invert(AI.Side); // стартовое направление
+        direction = Sider.Invert(AI.Side); // initial direction
     }
 }

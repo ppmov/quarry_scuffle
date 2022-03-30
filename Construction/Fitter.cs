@@ -4,7 +4,6 @@ using UnityEngine;
 using Context;
 using static Players;
 
-// макет для строительства
 [System.Serializable]
 public class Fitter
 {
@@ -22,7 +21,7 @@ public class Fitter
     public void Enable(char fitId, Mesh mesh)
     {
         Id = fitId;
-        fitter = Object.Instantiate(prefab, Vector3.zero, Quaternion.Euler(-90f, 0f, Myself.Side == Side.Правые ? 180f : 0f));
+        fitter = Object.Instantiate(prefab, Vector3.zero, Quaternion.Euler(-90f, 0f, Myself.Side == Side.Right ? 180f : 0f));
         fitter.GetComponent<MeshFilter>().mesh = mesh;
         fitter.GetComponent<MeshRenderer>().material = Myself.Color.building;
     }

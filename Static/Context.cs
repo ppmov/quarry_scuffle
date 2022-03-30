@@ -3,25 +3,25 @@ using UnityEngine;
 
 namespace Context
 {
-    // стороны и расы
-    public enum Side { Левые, Правые }
-    public enum Filter { Союзное, Вражеское, Собственное }
-    public enum PerformerType { Нечто, Здание, Создание }
-    public enum Race { Случайно = '0', Крестоносцы = 'C', Сектанты = 'S' }
+    // sides and fractions
+    public enum Side { Left, Right }
+    public enum Filter { Ally, Enemy, Own }
+    public enum PerformerType { Anything, Building, Unit }
+    public enum Race { Random = '0', Crusaders = 'C', Sectarians = 'S' }
 
     public static class Sider
     {
         public static Side Invert(Side side) => (Side)Mathf.Abs((int)side - 1);
-        public static Side Count(Side side, Filter filter) => filter == Filter.Вражеское ? Invert(side) : side;
-        public static Side GetByOwner(byte owner) => owner % 2 == 0 ? Side.Левые : Side.Правые;
+        public static Side Count(Side side, Filter filter) => filter == Filter.Enemy ? Invert(side) : side;
+        public static Side GetByOwner(byte owner) => owner % 2 == 0 ? Side.Left : Side.Right;
     }
 
-    // сочетания типа брони и типа урона
-    public enum DamageType { Тупой, Колющий, Магический, Осадный }
-    public enum ArmorType { Естественная, Лёгкая, Тяжелая, Антимагия, Укрепленная }
-    public enum Technique { Ближний, Дальний, Бросок, Телекинез }
+    // armor and damage types combinations
+    public enum DamageType { Normal, Pierce, Magic, Siege }
+    public enum ArmorType { Natural, Light, Heavy, Antimagic, Fortified }
+    public enum Technique { Melee, Ranged, Throwing, Telekinesis }
 
-    // интерфейс для чтения в UI
+    // for UI reading
     public interface IObjectReader
     {
         public string Name { get; }
@@ -29,18 +29,18 @@ namespace Context
         public string Tooltip { get; }
     }
 
-    // характеристика объекта
+    // unit property
     public interface IPropertyReader
     {
         public float Initial { get; }
         public float Value { get; }
     }
 
-    // объект игрока с информацией по нему
+    // player and his info
     public class Player
     {
-        public static Player lDummy = new Player("", "", Side.Левые);
-        public static Player rDummy = new Player("", "", Side.Правые);
+        public static Player lDummy = new Player("", "", Side.Left);
+        public static Player rDummy = new Player("", "", Side.Right);
 
         public string Id { get; private set; }
         public string Name { get; private set; }
@@ -53,7 +53,7 @@ namespace Context
 
         public int Stock { get; set; }
 
-        public Player(string id = "", string name = "", Side side = Side.Левые, int colorId = -1, Race race = Race.Случайно, bool ready = false)
+        public Player(string id = "", string name = "", Side side = Side.Left, int colorId = -1, Race race = Race.Random, bool ready = false)
         {
             Id = id;
             Name = name;

@@ -5,10 +5,10 @@ using Context;
 
 public static class Instantiator
 {
-    public static GameObject GetCastle(Side side) => side == Side.Левые ? LeftCastle : RightCastle;
-    public static List<Vector3> GetConstructionPoints(Side side) => side == Side.Левые ? LeftConstructionPoints : RightConstructionPoints;
+    public static GameObject GetCastle(Side side) => side == Side.Left ? LeftCastle : RightCastle;
+    public static List<Vector3> GetConstructionPoints(Side side) => side == Side.Left ? LeftConstructionPoints : RightConstructionPoints;
 
-    // массивы активных юнитов и зданий
+    // active buildings and units list
     private static Dictionary<Naming, GameObject> Buildings { get; set; } = new Dictionary<Naming, GameObject>();
     private static Dictionary<Naming, GameObject> Units { get; set; } = new Dictionary<Naming, GameObject>();
     private static List<GameObject> Garbage { get; set; } = new List<GameObject>();
@@ -19,7 +19,7 @@ public static class Instantiator
 
     private static Dictionary<int, Dictionary<string, int>> UnitsCounter { get; set; } = new Dictionary<int, Dictionary<string, int>>();
 
-    // создание объектов
+    // instantiating
     public static void CreateBuilding(char fitId, int gradeId, byte owner, Vector3 position, Quaternion rotation)
     {
         Naming name = new Naming(Naming.Variety.Building, Players.GetPlayer(owner).Race, fitId, gradeId);
@@ -65,13 +65,13 @@ public static class Instantiator
         PhotonNetwork.Destroy(building);
     }
 
-    public static void CreateUnit(Naming.Variety type, char fitId, int gradeId, byte owner, Vector3 position, Quaternion rotation, Race race = Race.Случайно)
+    public static void CreateUnit(Naming.Variety type, char fitId, int gradeId, byte owner, Vector3 position, Quaternion rotation, Race race = Race.Random)
     {
-        // юниты создаются только на мастере
+        // only master can create unit
         if (!PhotonNetwork.IsMasterClient)
             return;
 
-        if (race == Race.Случайно)
+        if (race == Race.Random)
             race = Players.GetPlayer(owner).Race;
 
         Naming name = new Naming(type, race, fitId, gradeId);
@@ -91,7 +91,7 @@ public static class Instantiator
         PhotonNetwork.Instantiate("Races/" + race + "/Units/" + name, position, rotation, 0, data);
     }
 
-    // управление буфером объектов
+    // object buffer handling
     public static void AddPerformer(AI ai)
     {
         if (ai == null) 
@@ -192,31 +192,31 @@ public static class Instantiator
         return Garbage[Random.Range(0, Garbage.Count)];
     }
 
-    public static Vulnerable GetPerformerWithFilter(Side side, PerformerType affectsOnly = PerformerType.Нечто)
+    public static Vulnerable GetPerformerWithFilter(Side side, PerformerType affectsOnly = PerformerType.Anything)
     {
         List<int> exceptions = new List<int>();
-        GameObject[] performers = new GameObject[(affectsOnly != PerformerType.Здание ? Units.Count : 0) + (affectsOnly != PerformerType.Создание ? Buildings.Count : 0)];
+        GameObject[] performers = new GameObject[(affectsOnly != PerformerType.Building ? Units.Count : 0) + (affectsOnly != PerformerType.Unit ? Buildings.Count : 0)];
         int last = 0;
 
-        if (affectsOnly != PerformerType.Создание)
+        if (affectsOnly != PerformerType.Unit)
         {
             Buildings.Values.CopyTo(performers, last);
             last += Buildings.Count;
         }
 
-        if (affectsOnly != PerformerType.Здание)
+        if (affectsOnly != PerformerType.Building)
         {
             Units.Values.CopyTo(performers, last);
             last += Buildings.Count;
         }
 
-        // пока кол-во исключений меньше чем кол-во объектов
+        // until exceptions less than object count
         while (exceptions.Count < performers.Length)
         {
-            // возьмем случайную позицию
+            // take random position
             int index = Random.Range(0, performers.Length);
 
-            // сдвинем ее пока не вылезем из исключений
+            // move it
             for (; ; )
             {
                 if (exceptions.Count == 0)
@@ -231,7 +231,7 @@ public static class Instantiator
                     break;
             }
 
-            // вернем объект если он соответствует условиям
+            // return the object if it right
             Naming name = performers[index].name;
 
             if (name.Side == side)
@@ -248,16 +248,16 @@ public static class Instantiator
         return null;
     }
 
-    // единоразовая запись главных зданий
+    // one-time main castles setter
     public static void SetCastle(Side side, GameObject castle, BoxCollider site)
     {
         switch (side)
         {
-            case Side.Левые:
+            case Side.Left:
                 LeftCastle = castle;
                 LeftConstructionPoints = FindBuildablePoints(side, site);
                 break;
-            case Side.Правые:
+            case Side.Right:
                 RightCastle = castle;
                 RightConstructionPoints = FindBuildablePoints(side, site);
                 break;
@@ -277,14 +277,14 @@ public static class Instantiator
         PhotonNetwork.LocalPlayer.CustomProperties.Clear();
     }
 
-    // позиции строительства
+    // buildable points
     private static List<Vector3> FindBuildablePoints(Side side, BoxCollider site)
     {
         if (site == null)
             return null;
 
         List<Vector3> poses = new List<Vector3>();
-        int sign = side == Side.Левые ? -1 : 1;
+        int sign = side == Side.Left ? -1 : 1;
         int xCount = Mathf.RoundToInt(site.size.x / 10f);
         int zCount = Mathf.RoundToInt(site.size.z / 10f);
 

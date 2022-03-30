@@ -47,7 +47,7 @@ public class BotBuilder : MonoBehaviour
             if (player.Stock >= cost)
             {
                 player.Stock -= cost;
-                CreateBuilding(fitId, 0, Players.IndexOfPlayer(player.Id), buildPos, Quaternion.Euler(-90f, 0f, player.Side == Side.Правые ? 180f : 0f));
+                CreateBuilding(fitId, 0, Players.IndexOfPlayer(player.Id), buildPos, Quaternion.Euler(-90f, 0f, player.Side == Side.Right ? 180f : 0f));
                 buildIndex++;
             }
         }

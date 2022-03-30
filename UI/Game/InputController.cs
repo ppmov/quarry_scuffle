@@ -4,14 +4,13 @@ using UnityEngine.SceneManagement;
 using Photon.Pun;
 using UnityEngine.EventSystems;
 
-// Управление камерой и отслеживание нажатий
 public class InputController : MonoBehaviourPunCallbacks
 {
     public static AI Selected { get; private set; }
     private const float scrollSpeed = 2f;
     private const float defaultCamSpeed = 0.4f;
 
-    [Header("Камера")]
+    [Header("Camera")]
     [SerializeField]
     private Vector2 xMinMax;
     [SerializeField]
@@ -33,23 +32,23 @@ public class InputController : MonoBehaviourPunCallbacks
 
     private void Update()
     {
-        // движение камеры
+        // camera moving
         transform.position = new Vector3(
             Mathf.Clamp(transform.position.x + moveVector.x * CamSpeed, xMinMax.x, xMinMax.y),
             transform.position.y,
             Mathf.Clamp(transform.position.z + moveVector.y * CamSpeed, yMinMax.x, yMinMax.y));
 
-        // вывод полосок здоровья
+        // health bars displaying
         if (Input.GetKeyUp(KeyCode.LeftAlt))
             Options.IsHealthBarsVisible = !Options.IsHealthBarsVisible;
 
-        // менеджмент окон
+        // windows management
         if (Input.GetMouseButtonUp(0) && !eventer.IsPointerOverGameObject())
         {
             if (Selected != null)
                 Selected.HasSubstrate = false;
 
-            // клик по AI объекту
+            // unit click
             if (Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, Mathf.Infinity, 1 << 8))
             {
                 Selected = hit.collider.gameObject.GetComponentInParent<AI>();
@@ -57,19 +56,17 @@ public class InputController : MonoBehaviourPunCallbacks
                 if (Selected != null)
                     Selected.HasSubstrate = true;
             }
-            // клик в любую другую точку
             else
             {
                 Selected = null;
             }
         }
 
-        // приближение / отдаление камеры
+        // zoom
         if (Input.GetAxis("Mouse ScrollWheel") != 0f && !eventer.IsPointerOverGameObject())
             cam.fieldOfView = Mathf.Clamp(cam.fieldOfView - Mathf.Sign(Input.GetAxis("Mouse ScrollWheel")) * scrollSpeed, dMinMax.x, dMinMax.y);
     }
 
-    // кнопка Выход
     public void OnLeave()
     {
         Time.timeScale = 1;
@@ -78,7 +75,6 @@ public class InputController : MonoBehaviourPunCallbacks
             PhotonNetwork.LeaveRoom();
     }
 
-    // выход из сражения
     public override void OnLeftRoom()
     {
         PhotonNetwork.Disconnect();
@@ -90,10 +86,9 @@ public class InputController : MonoBehaviourPunCallbacks
         SceneManager.LoadScene(0);
     }
 
-    // движение камеры
     public void ResetCameraPosition(int side)
     {
-        // начальная позиция камеры - союзная крепость
+        // initial camera position - ally castle
         Vector3 startPos = Instantiator.GetCastle((Side)side).transform.position;
         startPos.y = cam.transform.position.y;
         startPos.z -= 20f;

@@ -10,15 +10,19 @@ public class TargetedAbility : Ability
     protected float range = Mathf.Infinity;
     private bool isReached = false;
 
-    public override string Tooltip => base.Tooltip + ((Range != null ? Range.Value : range) != Mathf.Infinity ? (" не более " + (Range != null ? Range.Value : range) + " м от цели") : string.Empty);
-    public IPropertyReader Range { get => GetProperty(Property.Type.Дальность); }
+    public override string Tooltip => base.Tooltip + 
+        ((Range != null ? Range.Value : range) != Mathf.Infinity 
+            ? (" within " + (Range != null ? Range.Value : range) + " range") 
+            : string.Empty);
+
+    public IPropertyReader Range { get => GetProperty(Property.Type.Range); }
 
     protected override void Awake()
     {
         base.Awake();
 
-        if (!properties.ContainsKey(Property.Type.Дальность))
-            AddProperty(Property.Type.Дальность, range, Options.MeleeRange, Mathf.Infinity);
+        if (!properties.ContainsKey(Property.Type.Range))
+            AddProperty(Property.Type.Range, range, Options.MeleeRange, Mathf.Infinity);
     }
 
     public override bool CheckAvailability(out Vulnerable target)
@@ -44,7 +48,6 @@ public class TargetedAbility : Ability
         return true;
     }
 
-    // выбор цели
     protected virtual Vulnerable SelectRequiredTarget() => null;
 
     protected override bool CanBeCocked()
@@ -55,7 +58,7 @@ public class TargetedAbility : Ability
         return isReached;
     }
 
-    // вызывается каждый кадр, если цель далеко (необходимо определить вектор движения)
+    // call each frame when target is too far
     public void UpdateBeforeReaching(out Vector3 moveVector)
     {
         moveVector = GetMoveVector();
@@ -68,7 +71,7 @@ public class TargetedAbility : Ability
         return moveVector;
     }
 
-    // вызывается каждый кадр, если цель близко (необходимо определить вектор направления)
+    // call each frame when target is close enough
     public void UpdateAtReaching(out Vector3 lookVector)
     {
         lookVector = GetLookVector();

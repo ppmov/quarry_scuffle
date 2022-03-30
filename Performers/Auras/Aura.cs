@@ -28,11 +28,11 @@ public struct Aura : IObjectReader
     [SerializeField]
     private string description;
 
-    [Header("Ёффекты")]
+    [Header("Effects")]
     [SerializeField]
     private List<Effect> effects;
 
-    [Header("¬рем€ действи€")]
+    [Header("Duration time")]
     [SerializeField]
     private int tick;
     [SerializeField]
@@ -53,9 +53,9 @@ public struct Aura : IObjectReader
             string text = string.Empty;
 
             for (int i = 0; i < effects.Count; i++)
-                text += (i == 0 ? " эффект " : " и ") + (effects[i].value > 0 ? "+" : string.Empty) + effects[i].value + " " + effects[i].property;
+                text += (i == 0 ? " effect of " : " and") + (effects[i].value > 0 ? " + " : " ") + effects[i].value + " " + effects[i].property;
 
-            return "<b>" + Name + ":</b> накладывает " + (TickCount == 1 ? "на " : TickCount + " раз по ") + TickLength + " сек" + text;
+            return "<b>" + Name + ":</b> applies " + (TickCount == 1 ? "on " : TickCount + " times for ") + TickLength + " sec" + text;
         }
     }
 }

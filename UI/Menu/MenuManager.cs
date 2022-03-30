@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-// Управление окнами меню
+// Menu windows manager
 public class MenuManager : MonoBehaviour
 {
     public enum Menu { Main, Room }

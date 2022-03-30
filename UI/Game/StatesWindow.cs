@@ -38,13 +38,13 @@ public class StatesWindow : MonoBehaviour
             Close();
     }
 
-    // открытие окна с инф-ей по сущности
+    // open window with entity info
     private void Open()
     {
         IsOpened = true;
         Revert();
 
-        // блоки способностей
+        // ability panels
         for (int i = 0; i < abilityPanels.Count; i++)
         {
             if (i < Selected.Abilities.Count)
@@ -54,7 +54,6 @@ public class StatesWindow : MonoBehaviour
         }
     }
 
-    // закрытие окна
     private void Close()
     {
         IsOpened = false;
@@ -68,7 +67,7 @@ public class StatesWindow : MonoBehaviour
     {
         imgHealth.fillAmount = 1;
         txtHealth.text = string.Empty;
-        txtArmorType.text = "Неуязвимый";
+        txtArmorType.text = "Invulnerable";
         txtArmor.text = string.Empty;
     }
 
@@ -81,7 +80,7 @@ public class StatesWindow : MonoBehaviour
             imgHealth.fillAmount = Vulnerable.Health.Value / Vulnerable.Health.Initial;
             txtHealth.text = Vulnerable.Health.Value + " / " + Vulnerable.Health.Initial;
             txtArmorType.text = Vulnerable.ArmorType.ToString();
-            txtArmor.text = "+ " + Vulnerable.Armor.Value + "% снижение урона";
+            txtArmor.text = "+ " + Vulnerable.Armor.Value + "% damage reduction";
         }
     }
 

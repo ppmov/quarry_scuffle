@@ -2,7 +2,6 @@
 using UnityEngine.UI;
 using static MenuManager;
 
-// Стартовое окно
 public class StartMenu : MonoBehaviour
 {
     [SerializeField]

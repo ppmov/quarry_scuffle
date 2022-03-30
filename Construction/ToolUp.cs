@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Context;
 
-// Настройка расы и ее представителей
+// Fraction setup
 public class ToolUp : MonoBehaviour
 {
     [SerializeField]

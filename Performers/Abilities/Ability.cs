@@ -3,20 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using Context;
 
-// Базовый класс способности
+// Base ability class
 public class Ability : MonoBehaviour, IObjectReader
 {
     public string Id { get => id; }
+    public virtual string Tooltip => 
+        "<b>" + Name + ":</b>" + 
+        ((Cooldown != null ? Cooldown.Value : cooldown) > 0f 
+            ? " every " + (Cooldown != null ? Cooldown.Value : cooldown) + " sec" 
+            : string.Empty);
 
     public string Name { get => fullname; } 
     public string Description { get => description; }
-    public virtual string Tooltip => "<b>" + Name + ":</b>" + ((Cooldown != null ? Cooldown.Value : cooldown) > 0f ? " каждые " + (Cooldown != null ? Cooldown.Value : cooldown) + " сек" : string.Empty);
     public bool IsCocked { get => IsCurrent && IsAnimated && !isRefreshing && CanBeCocked(); }
     public bool IsAnimated { get; protected set; }
     public bool CanMoveWhenCocked { get; protected set; }
     public float Wasted { get; protected set; }
     public Property GetProperty(Property.Type type) => properties.TryGetValue(type, out Property value) ? value : null;
-    public IPropertyReader Cooldown { get => properties.ContainsKey(Property.Type.Перезарядка) ? properties[Property.Type.Перезарядка] : null; }
+    public IPropertyReader Cooldown { get => properties.ContainsKey(Property.Type.Cooldown) ? properties[Property.Type.Cooldown] : null; }
 
     protected readonly Dictionary<Property.Type, Property> properties = new Dictionary<Property.Type, Property>();
     protected AI AI { get => ai; }
@@ -38,8 +42,8 @@ public class Ability : MonoBehaviour, IObjectReader
 
     protected virtual void Awake()
     {
-        if (!properties.ContainsKey(Property.Type.Перезарядка))
-            AddProperty(Property.Type.Перезарядка, cooldown, 0f, 100f);
+        if (!properties.ContainsKey(Property.Type.Cooldown))
+            AddProperty(Property.Type.Cooldown, cooldown, 0f, 100f);
     }
 
     protected virtual void OnEnable()
@@ -47,7 +51,6 @@ public class Ability : MonoBehaviour, IObjectReader
         StartCoolDown();
     }
 
-    // проверка на возможность использования
     public virtual bool CheckAvailability(out Vulnerable target)
     {
         target = null;
@@ -61,7 +64,7 @@ public class Ability : MonoBehaviour, IObjectReader
         return true;
     }
 
-    // основное действие
+    // main call
     public virtual bool TryUse()
     {
         if (!IsCurrent)

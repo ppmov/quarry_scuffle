@@ -5,7 +5,7 @@ using static Players;
 using static MenuManager;
 using Photon.Realtime;
 
-// Управление и взаимодействие с комнатой
+// Room management and interaction
 public class RoomSettings : MonoBehaviourPunCallbacks
 {
     private const float syncFrequency = 1f;
@@ -26,7 +26,6 @@ public class RoomSettings : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        // подключаемся к фотону
         PhotonNetwork.NickName = Manager.PlayerName;
         PhotonNetwork.GameVersion = Options.GameVersion;
         PhotonNetwork.AutomaticallySyncScene = true;
@@ -49,12 +48,12 @@ public class RoomSettings : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        // настраиваем UI под хоста / гостя
+        // set UI for host or guest
         roomNameField.text = PhotonNetwork.CurrentRoom.Name;
         readyButton.SetActive(true);
         leaveButton.SetActive(true);
 
-        // загружаем существующих пользователей и добавим себя
+        // load all players data
         ReloadPreparingCustomProperties();
         SetMyProperty("pos", GetFreeSlot());
 
@@ -96,7 +95,7 @@ public class RoomSettings : MonoBehaviourPunCallbacks
         }
     }
 
-    // кнопки интерфейса
+    // UI buttons events
     public void OnReady(bool value = true)
     {
         readyButton.SetActive(!value);

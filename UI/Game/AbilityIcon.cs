@@ -31,18 +31,14 @@ public class AbilityIcon : MonoBehaviour
             return;
 
         ability = Current.Abilities[id];
-
-        // заполнение элементов UI
         abilityName.text = ability.Name;
         icon.fillAmount = ability.Cooldown.Value > 0f ? ((float)ability.Wasted / ability.Cooldown.Value) : 1f;
 
-        // цвет иконки меняется при активации
         if (ability.IsCocked)
             icon.color = Color.blue;
         else
             icon.color = iconColor;
 
-        // тип урона
         if (ability is ProjectileTargetedAbility dmgAbility)
         {
             damageType.gameObject.SetActive(true);

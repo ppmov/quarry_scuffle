@@ -1,15 +1,15 @@
 using System;
 using Context;
 
-// имя объекта как разбираемый идентификатор
-// tRA0.1[9..9], где: t - тип, R - раса, A - порядковый номер, 0 - уровень, 1 - владелец, 9..9 - уникальный ключ
+// object name as unique identificator
+// tRA0.1[9..9], where: t - type, R - fraction, A - index, 0 - level, 1 - owner, 9..9 - unique key
 public struct Naming
 {
     public enum Variety { Building = 'b', Unit = 'u', Summoned = 's' }
     private enum HexId { A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P }
     public static char Int2Hex(int index) => ((HexId)index).ToString()[0];
 
-    // разбор структуры именования
+    // decomposition
     public Variety Type => (Variety)Text[0];
     public Race Race => (Race)Text[1];
     public char Id { get => Text[2]; }
@@ -33,7 +33,6 @@ public struct Naming
 
     private string Text { get; set; }
 
-    // конструкторы
     public Naming(string input)
     {
         Text = input;
@@ -48,7 +47,7 @@ public struct Naming
     public static implicit operator string(Naming n) => n.Text;
     public static implicit operator Naming(string s) => new Naming(s);
 
-    // проверка наследуемых по идентификатору
+    // is input string name can be child for this object
     public bool IsChild(string name)
     {
         Naming other = new Naming(name);
@@ -74,7 +73,7 @@ public struct Naming
         }
     }
 
-    // поиск наследуемых по идентификатору
+    // find potential childs
     public int CountChildGrade(int index)
     {
         switch (Grade)

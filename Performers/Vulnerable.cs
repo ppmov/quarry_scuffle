@@ -4,7 +4,7 @@ using Photon.Pun;
 using UnityEngine;
 using Context;
 
-// Обработка внешних воздействий на AI объект
+// Object outer contact with other objects
 public class Vulnerable : MonoBehaviour
 {
     public Naming ID => AI.ID;
@@ -14,15 +14,16 @@ public class Vulnerable : MonoBehaviour
     public float MoveSpeed { get => AI.MoveSpeed; }
     public GameObject Hitbox { get => hitbox; }
     public Vector3 HitPosition { get => hitbox.transform.position; }
-    public PerformerType PerformerType { get => ID.Type == Naming.Variety.Building ? PerformerType.Здание : PerformerType.Создание; }
+    public PerformerType PerformerType { get => ID.Type == Naming.Variety.Building ? PerformerType.Building : PerformerType.Unit; }
     public ArmorType ArmorType { get => armorType; }
     public List<Aura> Affectables { get => affectables; }
-    public string Tooltip => "<color=maroon>" + health + "</color> ед.зд. <color=silver>" + armor + "%</color> защ. типа <color=silver><i>" + armorType + "</i></color>";
+    public string Tooltip => "<color=maroon>" + health + "</color> health and <b>" + armor + "%</b> " + 
+                             "<color=silver><i>" + armorType + "</i></color>" + " armor";
 
-    public IPropertyReader Health { get => properties[Property.Type.Здоровье]; }
-    public IPropertyReader Armor { get => properties[Property.Type.Защита]; }
+    public IPropertyReader Health { get => properties[Property.Type.Health]; }
+    public IPropertyReader Armor { get => properties[Property.Type.Armor]; }
 
-    [Header("Параметры")]
+    [Header("Properties")]
     [SerializeField]
     private GameObject hitbox;
     [SerializeField]
@@ -52,11 +53,11 @@ public class Vulnerable : MonoBehaviour
         if (hitboxColliders == null)
             hitboxColliders = hitbox.GetComponents<Collider>();
 
-        if (!properties.ContainsKey(Property.Type.Защита))
-            properties.Add(Property.Type.Защита, new Property(armor, 0f, 100f));
+        if (!properties.ContainsKey(Property.Type.Armor))
+            properties.Add(Property.Type.Armor, new Property(armor, 0f, 100f));
 
-        if (!properties.ContainsKey(Property.Type.Здоровье))
-            properties.Add(Property.Type.Здоровье, new Property(health, 0f, health));
+        if (!properties.ContainsKey(Property.Type.Health))
+            properties.Add(Property.Type.Health, new Property(health, 0f, health));
     }
 
     // проверка на достижение цели из начальной позиции
@@ -109,7 +110,7 @@ public class Vulnerable : MonoBehaviour
     [PunRPC]
     private void DealDamage(float damage)
     {
-        properties[Property.Type.Здоровье] -= damage;
+        properties[Property.Type.Health] -= damage;
     }
 
     private IEnumerator AuraHandling(Aura aura)

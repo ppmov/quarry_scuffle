@@ -18,7 +18,7 @@ public class HiringAbility : Ability
             }
 
             if (unit != null)
-                text += " призывает " + unit.Tooltip;
+                text += " summons " + unit.Tooltip;
 
             return text;
         }

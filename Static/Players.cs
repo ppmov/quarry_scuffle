@@ -4,7 +4,7 @@ using Photon.Pun;
 using Context;
 using ExitGames.Client.Photon;
 
-// Список игроков и взаимодействие с ним
+// Player list and interactions with it
 public static class Players
 {
     public static bool IsGameStarted { get; private set; }
@@ -23,7 +23,7 @@ public static class Players
             PlayerColors.Add(new PlayerColor(buils[i], units[i], flags[i]));
     }
 
-    // текущий игрок
+    // current player
     public static Player Myself
     {
         get
@@ -36,7 +36,7 @@ public static class Players
         }
     }
 
-    // получение игрока по порядковому номеру
+    // get player by index number
     public static Player GetPlayer(byte index)
     {
         if (index < 0 || index > MaxPlayersCount - 1)
@@ -45,7 +45,7 @@ public static class Players
         return list[index];
     }
 
-    // первый свободный слот
+    // first free player cell
     public static byte GetFreeSlot()
     {
         for (byte i = 0; i < list.Count; i++)
@@ -55,13 +55,13 @@ public static class Players
         return byte.MaxValue;
     }
 
-    // обновление полей по конкретному слоту
-    public static Player UpdateSlotLocal(byte index, string id, string name, Race race = Race.Случайно, bool ready = false)
+    // update player properties on the cell
+    public static Player UpdateSlotLocal(byte index, string id, string name, Race race = Race.Random, bool ready = false)
     {
         if (index >= MaxPlayersCount)
             return null;
 
-        list[index] = new Player(id, name, index % 2 == 0 ? Side.Левые : Side.Правые, index, race, ready);
+        list[index] = new Player(id, name, index % 2 == 0 ? Side.Left : Side.Right, index, race, ready);
 
         if (!list[index].IsDummy)
             for (byte i = 0; i < list.Count; i++)
@@ -71,7 +71,7 @@ public static class Players
         return list[index];
     }
 
-    public static void UpdateBot(byte index, Race race = Race.Случайно)
+    public static void UpdateBot(byte index, Race race = Race.Random)
     {
         if (!PhotonNetwork.IsMasterClient)
             return;
@@ -91,7 +91,7 @@ public static class Players
         return bots;
     }
 
-    // увеличение ресурсов для всех игроков
+    // giving value number of gold to all players
     public static void IncomeAllPlayers(int value)
     {
         if (!PhotonNetwork.IsMasterClient) return;
@@ -104,7 +104,7 @@ public static class Players
 
             int stock = 0;
 
-            // найдем игрока и добавим ему нужное значение в общий контейнер
+            // find player and add gold value to public container
             foreach (Photon.Realtime.Player player in PhotonNetwork.CurrentRoom.Players.Values)
                 if (player.UserId == list[i].Id)
                 {
@@ -119,16 +119,15 @@ public static class Players
                     break;
                 }
 
-            // логика для ИИ
+            // AI logic
             if (stock == 0)
                 stock = list[i].Stock + value;
 
-            // локальные данные
+            // local data
             list[i].Stock = stock;
         }
     }
 
-    // трата ресурсов
     public static bool SpendMyStock(int value)
     {
         Hashtable props = PhotonNetwork.LocalPlayer.CustomProperties;
@@ -145,13 +144,11 @@ public static class Players
         return true;
     }
 
-    // очистка игрового слота
     public static Player ClearSlotLocal(byte index)
     {
         return UpdateSlotLocal(index, "", "");
     }
 
-    // поиск игрока по идентификатору
     public static byte IndexOfPlayer(string id)
     {
         for (byte i = 0; i < list.Count; i++)
@@ -161,7 +158,6 @@ public static class Players
         return byte.MaxValue;
     }
 
-    // все готовы?
     public static bool IsEveryoneReady()
     {
         foreach (Player player in list)
@@ -171,7 +167,6 @@ public static class Players
         return true;
     }
 
-    // исключение
     public static void KickPlayer(int index)
     {
         if (!PhotonNetwork.IsMasterClient)
@@ -193,7 +188,7 @@ public static class Players
             }
     }
 
-    // обновление подготовительных данных по игрокам
+    // update public player data before game
     public static void ReloadPreparingCustomProperties(bool lastTime = false)
     {
         if (PhotonNetwork.CurrentRoom == null) 
@@ -209,7 +204,7 @@ public static class Players
         {
             string id = string.Empty;
             string name = string.Empty;
-            Race race = Race.Случайно;
+            Race race = Race.Random;
             bool ready = false;
 
             foreach (Photon.Realtime.Player player in PhotonNetwork.CurrentRoom.Players.Values)
@@ -229,7 +224,7 @@ public static class Players
                 if (PhotonNetwork.MasterClient.CustomProperties.TryGetValue("bot-" + i, out object value))
                 {
                     id = "bot-" + i;
-                    name = "ИИ" + i;
+                    name = "AI" + i;
                     race = (Race)(char)(int)value;
                     ready = true;
                 }
@@ -238,7 +233,7 @@ public static class Players
         }
     }
 
-    // обновление игровых данных по игрокам
+    // update public player data in realtime
     public static void ReloadRealtimeCustomProperties()
     {
         if (PhotonNetwork.CurrentRoom == null)
@@ -257,7 +252,6 @@ public static class Players
             }
     }
 
-    // заполнение параметра
     public static void SetMyProperty(string property, object value)
     {
         Hashtable props = PhotonNetwork.LocalPlayer.CustomProperties;
@@ -266,7 +260,6 @@ public static class Players
         ReloadPreparingCustomProperties();
     }
 
-    // случайный выбор расы для игроков, не выбравших ее
     public static void RandomizePlayersRaces()
     {
         if (!PhotonNetwork.IsMasterClient) 
@@ -282,7 +275,7 @@ public static class Players
             {
                 foreach (Photon.Realtime.Player player in PhotonNetwork.CurrentRoom.Players.Values)
                     if (list[i].Id == player.UserId)
-                        if (list[i].Race == Race.Случайно)
+                        if (list[i].Race == Race.Random)
                         {
                             Hashtable props = player.CustomProperties;
                             props["race"] = (int)(char)GetRandomRace();
@@ -300,7 +293,7 @@ public static class Players
         return (Race)array.GetValue(Random.Range(1, array.Length));
     }
 
-    // сброс списка игроков
+    // revert player list
     public static void Revert()
     {
         list = new List<Player>
@@ -312,7 +305,7 @@ public static class Players
         };
 
         SetMyProperty("pos", byte.MaxValue);
-        SetMyProperty("race", (int)(char)Race.Случайно);
+        SetMyProperty("race", (int)(char)Race.Random);
         SetMyProperty("ready", false);
         SetMyProperty("stock", 0);
         IsGameStarted = false;

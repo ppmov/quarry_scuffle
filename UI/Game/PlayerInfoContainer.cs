@@ -30,7 +30,7 @@ public class PlayerInfoContainer : MonoBehaviour
         if (selected == null) 
             return;
 
-        // отсортируем список персонажей
+        // sort unit list
         Dictionary<string, int> pairs = Instantiator.GetPlayerUnits(selected.Index);
         List<string> sorted = new List<string>(pairs.Count);
 
@@ -50,7 +50,7 @@ public class PlayerInfoContainer : MonoBehaviour
             pairs.Remove(next);
         }
 
-        // выведем отсортированный список
+        // return sorted list
         pairs = Instantiator.GetPlayerUnits(selected.Index);
         unitList.text = string.Empty;
 
@@ -59,7 +59,7 @@ public class PlayerInfoContainer : MonoBehaviour
             string space;
 
             if (pairs[naming] < 10)
-                space = "     ";
+                space = "     "; // yes that's indent
             else
             if (pairs[naming] < 100)
                 space = "   ";

@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using Context;
 
-// Индикатор здоровьев
 public class Healthbar : MonoBehaviour
 {
     private Vulnerable vulner;
@@ -19,11 +18,11 @@ public class Healthbar : MonoBehaviour
 
         switch (vulner.Side)
         {
-            case Side.Левые:
+            case Side.Left:
                 defaultRotation = new Quaternion(-0.4f, 0f, 0f, 0.9f);
                 image.fillOrigin--;
                 break;
-            case Side.Правые:
+            case Side.Right:
                 defaultRotation = new Quaternion(0f, 0.9f, 0.4f, 0f);
                 break;
             default:
@@ -36,7 +35,7 @@ public class Healthbar : MonoBehaviour
     {
         image.enabled = Options.IsHealthBarsVisible;
         transform.position = vulner.transform.position + abovePosition;
-        transform.rotation = vulner.Side == Side.Правые ? defaultRotation : Quaternion.Inverse(defaultRotation);
+        transform.rotation = vulner.Side == Side.Right ? defaultRotation : Quaternion.Inverse(defaultRotation);
         image.fillAmount = vulner.Health.Value / vulner.Health.Initial;
     }
 

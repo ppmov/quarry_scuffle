@@ -13,7 +13,7 @@ public class Tooltip : MonoBehaviour
         text = GetComponentInChildren<Text>();
     }
 
-    // Смена тултипа при наведении на соответствующие элементы
+    // Fill tooltip depends of pointer position
     public void OnPointerBuildingButton(int index)
     {
         GameObject go;
@@ -22,7 +22,7 @@ public class Tooltip : MonoBehaviour
 
         if (Selected == null)
             go = Builder.ToolUp.GetBuildingPrefab(index, subindex);
-        else // улучшение
+        else // upgrade
             go = Builder.ToolUp.GetBuildingPrefab(Selected.ID.Id, Selected.ID.CountChildGrade((index - 3) / 4));
 
         if (go != null)
@@ -55,18 +55,18 @@ public class Tooltip : MonoBehaviour
     public void OnPointerArmorType(ArmorType type)
     {
         List<float> damages = Resistances.GetDamages(type);
-        text.text = "<b>" + type + "</b> защита получает:\n";
+        text.text = "<b>" + type + "</b> armor receives:\n";
 
         for (int i = 0; i < damages.Count; i++)
-            text.text += "<i>" + (DamageType)i + "</i> урон - <i>" + (damages[i] * 100) + "%</i>;\n";
+            text.text += "<i>" + (DamageType)i + "</i> damage - <i>" + (damages[i] * 100) + "%</i>;\n";
     }
 
     public void OnPointerDamageType(DamageType type)
     {
         List<float> armors = Resistances.GetArmors(type);
-        text.text = "<b>" + type + "</b> урон наносит:\n";
+        text.text = "<b>" + type + "</b> damage deals:\n";
 
         for (int i = 0; i < armors.Count; i++)
-            text.text += "<i>" + (ArmorType)i + "</i> защита - <i>" + (armors[i] * 100) + "%</i>;\n";
+            text.text += "<i>" + (ArmorType)i + "</i> armor - <i>" + (armors[i] * 100) + "%</i>;\n";
     }
 }

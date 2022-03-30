@@ -4,9 +4,8 @@ using static Players;
 
 public class RunningProjectileTargetedAbility : ProjectileTargetedAbility
 {
-    public override string Tooltip => base.Tooltip + " и продолжает движение";
+    public override string Tooltip => base.Tooltip + " and keeps moving";
 
-    [Header("Время достижения цели для старта анимации")]
     [SerializeField]
     private float timeToMotion;
     private Vector3 moveVector;
@@ -24,7 +23,7 @@ public class RunningProjectileTargetedAbility : ProjectileTargetedAbility
         if (target == null)
             return null;
 
-        // запрещаем выбирать цели, для которых нужен большой поворот
+        // can't select target with big rotate angle
         target.DoesItReach(AI.Position, Range.Value, out Vector3 hitVector, false);
 
         if (Vector3.Angle(AI.transform.forward, hitVector) < 60f)
@@ -41,7 +40,7 @@ public class RunningProjectileTargetedAbility : ProjectileTargetedAbility
         if (AI.CurrentAbilityID != Id)
             return false;
 
-        // определим скорость сближения
+        // determinate movespeed
         float v = AI.MoveSpeed;
         float angle = Vector3.Angle(AI.transform.forward, AI.Target.transform.forward);
 
@@ -51,14 +50,14 @@ public class RunningProjectileTargetedAbility : ProjectileTargetedAbility
         if (angle > 150f)
             v += AI.Target.MoveSpeed;
 
-        // возвращает true если дистанция сближения достаточная для запуска анимации
+        // true if close enough for animation start
         float t = (AI.Target.HitPosition - AI.Vulnerable.HitPosition).magnitude / v;
         return 0f < t && t <= timeToMotion;
     }
 
     protected override Vector3 GetMoveVector()
     {
-        // ишем подступ к цели слева от нее
+        // get left move vector
         AI.CheckWayToTargetIsFree(AI.Target, Range.Value, out moveVector, 1);
         return moveVector;
     }

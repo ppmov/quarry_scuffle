@@ -22,7 +22,8 @@ public class AuraSource : MonoBehaviour, IObjectReader
 
     public string Name => aura.Name;
     public string Description => aura.Description;
-    public string Tooltip { get => aura.Tooltip + " в <i>" + filter + " " + affectsOnly + "</i>, в радиусе - <i>" + AuraRange + "</i> м"; }
+    public string Tooltip { get => aura.Tooltip + " to <i>" + filter + " " + affectsOnly + "</i>" +
+            (AuraRange <= 0 ? string.Empty : " within <i>" + AuraRange + "</i> range"); }
 
     private void Start()
     {
@@ -36,13 +37,13 @@ public class AuraSource : MonoBehaviour, IObjectReader
     {
         for (; ; )
         {
-            if (filter != Filter.Собственное)
+            if (filter != Filter.Own)
                 foreach (Vulnerable vul in sight.SelectAll(side, affectsOnly, Mathf.Infinity, new Vector3(), myself))
                     vul.InitiateAura(aura);
 
-            if (filter != Filter.Вражеское)
+            if (filter != Filter.Enemy)
                 if (myself != null)
-                    if (affectsOnly == myself.PerformerType || affectsOnly == PerformerType.Нечто)
+                    if (affectsOnly == myself.PerformerType || affectsOnly == PerformerType.Anything)
                         myself.InitiateAura(aura);
 
             yield return new WaitForSeconds(1f);

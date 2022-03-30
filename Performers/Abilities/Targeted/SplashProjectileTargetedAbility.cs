@@ -5,7 +5,7 @@ using static Players;
 
 public class SplashProjectileTargetedAbility : ProjectileTargetedAbility
 {
-    public override string Tooltip => base.Tooltip + " + может иметь несколько целей";
+    public override string Tooltip => base.Tooltip + " and also affects several targets";
 
     protected override void Throw()
     {

@@ -5,7 +5,7 @@ using Context;
 
 public class Property : IPropertyReader
 {
-    public enum Type { Здоровье, Защита, Урон, Перезарядка, Дальность, Частота, Скорость }
+    public enum Type { Health, Armor, Damage, Cooldown, Range, Frequency, Speed }
 
     public float Initial { get; private set; }
 

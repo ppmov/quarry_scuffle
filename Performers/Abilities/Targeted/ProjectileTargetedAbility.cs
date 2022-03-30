@@ -8,7 +8,7 @@ public class ProjectileTargetedAbility : TargetedAbility
     [SerializeField]
     private Filter filter;
 
-    [Header("Создаваемый снаряд")]
+    [Header("Projectile")]
     [SerializeField]
     private Projectile.Parameters parameters;
     protected Projectile projectile;
@@ -19,20 +19,19 @@ public class ProjectileTargetedAbility : TargetedAbility
         {
             string text = base.Tooltip;
 
-            text += " наносит <color=maroon>" + (Damage != null ? Damage.Value : parameters.damage) + "</color> ур. " + 
-                    "типа <color=navy><i>" + DamageType + "</i></color> " + 
-                    "в <i>" + Filter + " " + AffectsOnly + "</i>";
+            text += " deals <color=maroon>" + (Damage != null ? Damage.Value : parameters.damage) + "</color> " + 
+                "<color=navy><i>" + DamageType + "</i></color> damage to <i>" + Filter + " " + AffectsOnly + "</i>";
 
             foreach (Projectile.Modifier mod in Modifiers)
-                text += " + мод типа " + "<i>" + mod.type + "</i> на <color=maroon>" + mod.damage + "</color> ур." + 
-                        "типа <color=navy><i>" + mod.damageType + "</i></color>";
+                text += " + <i>" + mod.type + "</i> modifier deals <color=maroon>" + mod.damage + "</color> " + 
+                    "<color=navy><i>" + mod.damageType + "</i></color> damage";
 
             return text;
         }
     }
 
-    public IPropertyReader Damage { get => GetProperty(Property.Type.Урон); }
-    public IPropertyReader Speed { get => GetProperty(Property.Type.Скорость); }
+    public IPropertyReader Damage { get => GetProperty(Property.Type.Damage); }
+    public IPropertyReader Speed { get => GetProperty(Property.Type.Speed); }
 
     public Filter Filter { get => filter; }
     public PerformerType AffectsOnly { get => parameters.affectsOnly; }
@@ -49,11 +48,11 @@ public class ProjectileTargetedAbility : TargetedAbility
         if (projectile == null)
             projectile = new Projectile(parameters);
 
-        if (!properties.ContainsKey(Property.Type.Урон))
-            AddProperty(Property.Type.Урон, parameters.damage, -255f, 255f);
+        if (!properties.ContainsKey(Property.Type.Damage))
+            AddProperty(Property.Type.Damage, parameters.damage, -255f, 255f);
 
-        if (!properties.ContainsKey(Property.Type.Скорость))
-            AddProperty(Property.Type.Скорость, parameters.speed, 0.1f, 1f);
+        if (!properties.ContainsKey(Property.Type.Speed))
+            AddProperty(Property.Type.Speed, parameters.speed, 0.1f, 1f);
     }
 
     public override bool TryUse()
@@ -61,8 +60,8 @@ public class ProjectileTargetedAbility : TargetedAbility
         if (!base.TryUse())
             return false;
 
-        parameters.damage = properties[Property.Type.Урон].Value;
-        parameters.speed = properties[Property.Type.Скорость].Value;
+        parameters.damage = properties[Property.Type.Damage].Value;
+        parameters.speed = properties[Property.Type.Speed].Value;
 
         Throw();
         return true;
